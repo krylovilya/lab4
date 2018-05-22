@@ -6,35 +6,34 @@
 
 using namespace std;
 
-// Первое приложение отсылает третьему коэффициенты а1, а2, …an
 int main(){ 
-	int n; 
+	int n, n2; 
 
 	// Создание канала
-	mkfifo("3_1", S_IFIFO | 0666); 
-	mkfifo("1_3", S_IFIFO | 0666);
-	
+	mkfifo("1_2", S_IFIFO | 0666); 
+	mkfifo("2_1", S_IFIFO | 0666);
+
+	start:
+
 	// Чтение
-	int fd31 = open("3_1", O_RDONLY);
-	read(fd31, &n, 4);
-	close(fd31);
+	int fd21 = open("2_1", O_RDONLY);
+	read(fd21, &n2, 4);
+	close(fd21);
 
-	// Вывод
-	cout << "n: " << n << endl;
+	cout << "n: ";
+	cin >> n;
 
-	// Ввод 
-	int arr[n];
-	cout << "Enter " << n << " elements\n";
-	for (int i = 0; i < n; i++) {
-		cin >> arr[i];
-	}
+	//Запись
+	int fd12 = open("1_2", O_WRONLY);
+	write(fd12, &n, 4);
+	close(fd12);
+	
+	if (n2 == n) {cout << endl << "exit"; goto end; }
 
-	// Запись
-	int fd13 = open("1_3", O_WRONLY);
-	write(fd13, &arr, 4*n);
-	close(fd13);
+	goto start;		
+	end:
 
-	unlink("3_1");
-	unlink("1_3");
+	unlink("2_1");
+	unlink("1_2");
 	return 0;
 }
